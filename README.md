@@ -1,148 +1,137 @@
 # Hangry
 
-Hangry is a multi-channel food ordering platform that ships with a customer web app, an operations/admin portal, a lightweight user-management console, a React Native (Expo) client, and an Express/MongoDB backend. It supports menu curation, carts, COD and Stripe checkout, and near-real-time order tracking.
+Hangry là nền tảng đặt đồ ăn đa kênh gồm web cho khách hàng, portal quản trị, console quản lý user, ứng dụng di động (Expo) và backend Express/MongoDB. Hệ thống hỗ trợ quản lý thực đơn, giỏ hàng, đặt COD/Stripe và theo dõi đơn hàng gần thời gian thực.
 
-## Repository Layout
+## Cấu trúc thư mục
 
-| Path          | Description                                                     | Primary Tech                        |
-| ------------- | --------------------------------------------------------------- | ----------------------------------- |
-| `backend/`    | REST API, auth, menus, carts, orders, payments, file uploads    | Node.js, Express, MongoDB, Stripe   |
-| `frontend/`   | Customer-facing Vite + React storefront                         | React 18, Vite, Axios               |
-| `admin/`      | Operations dashboard for menus & orders                         | React 18, React Router, Toastify    |
-| `users-admin/`| Lightweight console to search/update/remove platform users      | React 18, React Router              |
-| `mobile/`     | Expo app with tabs for browse/cart/orders/profile               | Expo Router, React Native, Zustand  |
-| `uploads/`    | Local image bucket served at `/images/*` when Cloudinary is off | Express static assets               |
+| Đường dẫn        | Mô tả                                                                 | Công nghệ chính                    |
+| ---------------- | --------------------------------------------------------------------- | ---------------------------------- |
+| `backend/`       | REST API, xác thực, CRUD món, giỏ hàng, đơn, thanh toán, upload ảnh  | Node.js, Express, MongoDB, Stripe  |
+| `frontend/`      | Website khách đặt món (Vite + React)                                 | React 18, Vite, Axios              |
+| `admin/`         | Portal vận hành: thêm món, xem menu, cập nhật trạng thái đơn         | React 18, React Router, Toastify   |
+| `users-admin/`   | Console nhẹ quản lý người dùng (tìm kiếm, đổi role, khóa)           | React 18, React Router             |
+| `mobile/`        | Ứng dụng Expo: tab Home, Cart, Orders, Profile                       | Expo Router, React Native, Zustand |
+| `uploads/`       | Thư mục chứa ảnh khi không dùng Cloudinary (serve qua `/images/*`)   | Static assets của Express          |
 
-## Feature Highlights
+## Tính năng chính
 
-- **Unified backend (`backend/server.js`)** with JWT auth, cart persistence, menu CRUD, Stripe checkout (`/api/order/place`) and COD fallback (`/api/order/place-cod`), plus optional Cloudinary uploads.
-- **Web storefront (`frontend/src`)** for browsing, filtering, adding to cart, authentication (`LoginPopup`), placing orders, and verifying payments via `/verify`.
-- **Admin portal (`admin/src/pages`)** to add new dishes (with image validation), review menus, and manage fulfillment state on each order.
-- **User-management console (`users-admin/src/pages/Users.jsx`)** for role toggling, activation/suspension, and deletion via search + filters.
-- **Mobile client (`mobile/app/(tabs)`)** with native cart interactions, order placement, and profile/login flows backed by the same API (`mobile/src/api/client.ts`).
-- **Media handling** via local `uploads/` or Cloudinary, exposed through `/images/<filename>` so all clients render menu photos consistently.
+- **Backend thống nhất**: JWT auth, lưu giỏ, CRUD menu, Stripe checkout (`/api/order/place`) & COD (`/api/order/place-cod`), upload Multer + Cloudinary.
+- **Web khách hàng**: duyệt danh mục, lọc, thêm/giảm giỏ, đăng nhập/đăng ký (`LoginPopup`), đặt đơn, xác minh thanh toán `/verify`.
+- **Admin portal**: thêm món có kiểm tra dữ liệu, danh sách món, cập nhật trạng thái đơn (Food Processing → Delivered).
+- **User console**: tìm kiếm, lọc role/trạng thái, chuyển user ↔ admin, khóa/mở và xóa người dùng.
+- **App di động**: tab-based, quản lý giỏ, đặt hàng, đăng nhập, xem lịch sử; tái sử dụng cùng API.
+- **Quản lý media**: ảnh địa phương qua `/images/<file>` hoặc URL Cloudinary.
 
-## Tech Stack
+## Công nghệ
 
-- **Backend:** Node.js 20+, Express 4, Mongoose 8, JWT, bcrypt, Multer, Stripe SDK, optional Cloudinary.
-- **Web Clients:** React 18 + Vite 5/7, React Router 6, Axios, React Icons, React Toastify.
+- **Backend:** Node 20+, Express 4, Mongoose 8, JWT, bcrypt, Multer, Stripe, Cloudinary (tùy chọn).
+- **Web:** React 18, Vite 5/7, React Router 6, Axios, React Icons/Toastify.
 - **Mobile:** Expo SDK 54, React Native 0.81, Expo Router, React Query, Zustand, AsyncStorage.
 - **Tooling:** Nodemon, ESLint, Vite, Expo CLI.
 
-## Prerequisites
+## Chuẩn bị
 
-- Node.js >= 20 and npm >= 10.
-- MongoDB Atlas or local Mongo instance.
-- Stripe test keys (secret + publishable) for card checkout.
-- (Optional) Cloudinary account for CDN-based image storage.
-- Expo CLI & a simulator/device for the mobile app.
+- Node.js ≥ 20 và npm ≥ 10.
+- MongoDB Atlas hoặc local.
+- Khóa Stripe test.
+- (Tuỳ chọn) Cloudinary.
+- Expo CLI + thiết bị/simulator.
 
-## Getting Started
+## Cài đặt
 
-1. **Clone the repo**
-
-   ```bash
-   git clone https://github.com/TNTDanh/Software_Hangry.git
-   cd Software_Hangry
-Install dependencies (per workspace)
-
-bash
+```bash
+git clone https://github.com/TNTDanh/Software_Hangry.git
+cd Software_Hangry
 
 cd backend && npm install
 cd ../frontend && npm install
 cd ../admin && npm install
 cd ../users-admin && npm install
 cd ../mobile && npm install
-Environment Variables
-Create the following files before running any services.
-
+Biến môi trường
 backend/.env
 
 PORT=4000
 MONGO_URI=mongodb+srv://<user>:<pass>@cluster.mongodb.net/hangry
-JWT_SECRET=<random-long-secret>
+JWT_SECRET=<chuỗi-bất-kỳ>
 CLIENT_URL=http://localhost:5173,http://localhost:4173,http://localhost:5174
 FRONTEND_URL=http://localhost:5173
 STRIPE_SECRET_KEY=sk_test_xxx
-CLOUDINARY_CLOUD_NAME=<optional>
-CLOUDINARY_API_KEY=<optional>
-CLOUDINARY_API_SECRET=<optional>
-CLIENT_URL is a comma-separated list of origins allowed by CORS.
-Leave Cloudinary keys empty to keep files in uploads/.
+CLOUDINARY_CLOUD_NAME=<nếu dùng>
+CLOUDINARY_API_KEY=<nếu dùng>
+CLOUDINARY_API_SECRET=<nếu dùng>
+CLIENT_URL: danh sách origin (cách nhau dấu phẩy) được CORS cho phép.
+Bỏ trống Cloudinary nếu muốn lưu file trong uploads/.
 frontend/.env
 
 VITE_API_URL=http://localhost:4000
-The React app falls back to https://hangry-backend.onrender.com, so override it for local dev.
-
-admin/.env (or .env.local)
+admin/.env (hoặc .env.local)
 
 VITE_API_URL=http://localhost:4000
 users-admin/.env
 
 VITE_API_URL=http://localhost:4000
-mobile API base
-Update both mobile/src/api/client.ts and mobile/src/until/image.ts so API_URL points at your backend (e.g., http://10.0.2.2:4000 for Android emulators). You can refactor these files to read from process.env.EXPO_PUBLIC_API_URL if you prefer.
+mobile
+Trong mobile/src/api/client.ts và mobile/src/until/image.ts sửa API_URL trỏ về backend (VD: http://10.0.2.2:4000 cho Android emulator). Có thể refactor đọc process.env.EXPO_PUBLIC_API_URL nếu muốn cấu hình động.
 
-Running the Apps
-Service	Command	Notes
-Backend API	cd backend && npm run server	Nodemon listens on PORT (default 4000).
-Web storefront	cd frontend && npm run dev	Vite default port 5173.
-Admin portal	cd admin && npm run dev	Requires VITE_API_URL.
-User console	cd users-admin && npm run dev	Routes to /users by default.
-Mobile app	cd mobile && npx expo start	Use npm run android / ios / web as needed.
-Make sure backend is running before launching any client so API requests resolve.
+Chạy các dịch vụ
+Dịch vụ	Lệnh	Ghi chú
+Backend API	cd backend && npm run server	Nodemon, port 4000 (hoặc PORT).
+Web khách hàng	cd frontend && npm run dev	Mặc định 5173.
+Admin portal	cd admin && npm run dev	Cần VITE_API_URL.
+User console	cd users-admin && npm run dev	Redirect tới /users.
+Mobile (Expo)	cd mobile && npx expo start	Dùng npm run android/ios/web tùy môi trường.
+Luôn khởi động backend trước để các client gọi API thành công.
 
-API Reference (partial)
-Method	Endpoint	Description	Auth Header (token)
-POST	/api/user/register	Register user (name, email, password).	No
-POST	/api/user/login	Login, returns JWT token.	No
-GET	/api/user/list	List/search users (admin console).	Should be protected
-POST	/api/user/update	Toggle roles or active flag.	Should be protected
-POST	/api/user/remove	Delete user.	Should be protected
-POST	/api/food/add	Add menu item with image (Multer or Cloudinary).	Should be admin
-GET	/api/food/list	Public menu listing.	No
-POST	/api/food/remove	Remove menu item (image cleaned up).	Admin
-POST	/api/cart/add	Increment cart item count.	Yes
-POST	/api/cart/remove	Decrement cart item count.	Yes
-POST	/api/cart/get	Fetch persisted cart.	Yes
-POST	/api/order/place	Stripe checkout, returns session_url.	Yes
-POST	/api/order/place-cod	Place unpaid COD order.	Yes
-POST	/api/order/verify	Called by frontend /verify screen post-checkout.	No
-POST	/api/order/userorders	List current user orders.	Yes
-GET	/api/order/list	Admin-facing order feed.	Admin
-POST	/api/order/status	Update order status (Food Processing etc.).	Admin
-Images uploaded via /api/food/add are available at /images/<filename> unless you supply Cloudinary keys (then the stored value is a https://res.cloudinary.com/... URL).
+API chính
+Method	Endpoint	Mô tả	Header token
+POST	/api/user/register	Đăng ký (name, email, password).	Không
+POST	/api/user/login	Đăng nhập, trả JWT.	Không
+GET	/api/user/list	Danh sách/tìm kiếm user (console).	Nên bảo vệ
+POST	/api/user/update	Đổi role hoặc trạng thái hoạt động.	Nên bảo vệ
+POST	/api/user/remove	Xóa user.	Nên bảo vệ
+POST	/api/food/add	Thêm món + upload ảnh.	Admin
+GET	/api/food/list	Lấy toàn bộ menu.	Không
+POST	/api/food/remove	Xóa món (dọn ảnh local/Cloudinary).	Admin
+POST	/api/cart/add	Tăng số lượng 1 món trong giỏ.	Có
+POST	/api/cart/remove	Giảm số lượng.	Có
+POST	/api/cart/get	Lấy giỏ lưu trên server.	Có
+POST	/api/order/place	Stripe Checkout, trả session_url.	Có
+POST	/api/order/place-cod	Đặt COD.	Có
+POST	/api/order/verify	FE gọi sau khi Stripe redirect về /verify.	Không
+POST	/api/order/userorders	Lịch sử đơn của user hiện tại.	Có
+GET	/api/order/list	Admin xem tất cả đơn.	Admin
+POST	/api/order/status	Cập nhật trạng thái đơn.	Admin
+Ảnh local nằm trong uploads/ và được serve qua /images/<tên_file>. Khi dùng Cloudinary, DB lưu luôn URL CDN.
 
-Stripe & Order Flow
-Frontend/mobile posts items, amount, and address to /api/order/place.
-Backend creates a Mongo order (default payment=false) and a Stripe Checkout session.
-User is redirected to session_url. Stripe redirects back to ${FRONTEND_URL}/verify?....
-Frontend calls /api/order/verify with orderId and success.
-COD orders skip Stripe and call /api/order/place-cod.
-Keep FRONTEND_URL aligned with the port that serves /verify, otherwise Stripe success/cancel pages will 404.
+Quy trình Stripe/COD
+Frontend/mobile gửi items, amount, address tới /api/order/place.
+Backend tạo bản ghi order (payment=false) và session Stripe.
+Người dùng thanh toán trên Stripe, sau đó được redirect về ${FRONTEND_URL}/verify?success=....
+FE gọi /api/order/verify với orderId, success.
+COD dùng /api/order/place-cod, không cần Stripe.
+Đảm bảo FRONTEND_URL trùng port đang chạy trang /verify.
 
-Assets & Uploads
-Local images land in uploads/ and are statically served through app.use("/images", express.static("uploads")).
-When Cloudinary env vars are present, files are pushed to foodfast/foods and only the secure URL is stored.
-Admin UI will fall back to /header_img.png or the logo if an image fails to load (admin/src/pages/List/List.jsx).
-Mobile Notes
-Tabs live in mobile/app/(tabs) (index, cart, orders, myorders, profile).
-State is managed with Zustand stores (mobile/lib/store/cart.ts, mobile/lib/store/auth.ts).
-Axios client injects the JWT token header automatically (mobile/src/api/client.ts).
-Update API_URL for local devices (iOS simulator can use http://localhost:4000, Android emulator needs http://10.0.2.2:4000).
-Development Tips
-Seed food documents manually or via Mongo shell so clients have items to render.
-Keep the uploads/ folder writable by the backend server process.
-CORS is strict: update CLIENT_URL whenever you introduce a new host/port.
-Consider wrapping admin-only routes with middleware; currently they are open.
-Contributing
-Fork the repo.
-Create a feature branch: git checkout -b feat/<feature-name>
-Make changes + add tests if applicable.
-Open a PR targeting dev.
+Ứng dụng di động
+Tabs nằm trong mobile/app/(tabs) (index, cart, orders, myorders, profile).
+State dùng Zustand (mobile/lib/store/cart.ts, mobile/lib/store/auth.ts).
+Axios client tự gắn header token từ store.
+Nhớ chỉnh API_URL phù hợp thiết bị (Android emulator dùng 10.0.2.2, iOS simulator có thể dùng localhost).
+Lưu ý phát triển
+Nên seed sẵn dữ liệu food trong Mongo để UI có món hiển thị.
+Thư mục uploads/ phải được ghi bởi process Node.
+Khi thêm origin mới (VD: admin chạy port khác) phải cập nhật CLIENT_URL.
+Các route admin (user, menu, order) hiện chưa có middleware; cân nhắc bổ sung nếu deploy production.
+Đóng góp
+Fork repo.
+Tạo nhánh: git checkout -b feat/<ten-tinh-nang>.
+Commit & test.
+Mở Pull Request về nhánh dev.
 License
 MIT
 
 
 
-Next steps: decide whether to replace `README.md` directly or adapt parts of this draft, then run through each service to confirm the env vars/ports are correct and that mobile clients point to the intended backend.
+Gợi ý tiếp theo:  
+1. Đặt file `.env` và cập nhật `API_URL` trong app mobile để chạy local.  
+2. Kiểm tra lại các route admin cần middleware bảo vệ trước khi đưa vào môi trường thực tế.
